@@ -2,7 +2,7 @@
 
 ## Description and deliverables
 In this capstone project, I will analyze a dataset and build predictive models to provide insights to the Human Resources (HR) department of a large consulting firm.   
-For my deliverables, I will include the model evaluation (and interpretation if applicable), data visualizations directly related to the questions asked, ethical considerations, and the resources I used to troubleshoot and find answers or solutions.
+For my deliverables, I will include the model evaluation (and interpretation if applicable), data visualizations directly related to the questions asked, ethical considerations, and the resources I used to troubleshoot and find answers or solutions. For This case study I'm using Python to conduct an EDA.
 # **PACE stages**
 ![pace](https://github.com/ImanBrjn/python_Salifort_Motors/assets/140934258/8bc00ccd-4772-4341-b5ef-13d441fc8dcf)
 ## **Pace: Plan**
@@ -29,3 +29,55 @@ left|Whether or not the employee left the company
 promotion_last_5years|Whether or not the employee was promoted in the last 5 years
 Department|The employee's department
 salary|The employee's salary (U.S. dollars)
+## Step 1. Imports
+*   First let's import requaired packages.
+### Import packages
+```
+# Import packages
+
+# For data manipulation
+import numpy as np
+import pandas as pd
+
+# For data visualization
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# For displaying all of the columns in dataframes
+pd.set_option('display.max_columns', None)
+
+# For data modeling
+from xgboost import XGBClassifier
+from xgboost import XGBRegressor
+from xgboost import plot_importance
+
+from sklearn.linear_model import LogisticRegression
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
+
+# For metrics and helpful functions
+from sklearn.model_selection import GridSearchCV, train_test_split
+from sklearn.metrics import accuracy_score, precision_score, recall_score,\
+f1_score, confusion_matrix, ConfusionMatrixDisplay, classification_report
+from sklearn.metrics import roc_auc_score, roc_curve
+from sklearn.tree import plot_tree
+
+# For saving models
+import pickle
+```
+### Load dataset
+`Pandas` is used to read a dataset called **`HR_capstone_dataset.csv`.**  
+```
+# Load dataset into a dataframe
+df0 = pd.read_csv("HR_capstone_dataset.csv")
+
+
+# Display first few rows of the dataframe
+df0.head()
+```
+	satisfaction_level	last_evaluation	number_project	average_montly_hours	time_spend_company	Work_accident	left	promotion_last_5years	Department	salary
+0	0.38	0.53	2	157	3	0	1	0	sales	low
+1	0.80	0.86	5	262	6	0	1	0	sales	medium
+2	0.11	0.88	7	272	4	0	1	0	sales	medium
+3	0.72	0.87	5	223	5	0	1	0	sales	low
+4	0.37	0.52	2	159	3	0	1	0	sales	low
