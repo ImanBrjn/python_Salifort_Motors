@@ -190,3 +190,50 @@ df1.head()
 |2|0.11|0.88|7|272|4|0|1|0|sales|medium|
 |3|0.72|0.87|5|223|5|0|1|0|sales|low|
 |4|0.37|0.52|2|159|3|0|1|0|sales|low|
+
+Even though there are chances to have completely the same information with different employees, since we don't have identification info and we don't know if they are truly the same person, we still dropped the duplicates for the following reasons:
+
+1. We will still have 11991 data after we dropped the duplicates.
+2. Both of the classes have the duplicates, dropping the rows won't have a serious impact on the balance of the dataset.
+3. In order to keep our model more fair, dropping the duplicates is going to be better than not dropping them.
+
+### Checking for outliers
+```
+# Create a boxplot to visualize distribution of `tenure` and detect any outliers
+plt.figure(figsize=(6,6))
+plt.title('Boxplot to detect outliers for tenure', fontsize=12)
+plt.xticks(fontsize=12)
+plt.yticks(fontsize=12)
+sns.boxplot(x=df1['tenure'])
+plt.show()
+```
+![outlier](https://github.com/ImanBrjn/python_Salifort_Motors/assets/140934258/a967ace3-1a98-4c75-beed-6bbeb826570a)   
+
+The boxplot above shows that there are outliers in the `tenure` variable.
+It would be helpful to investigate how many rows in the data contain outliers in the `tenure` column.
+```
+# Determining the number of rows containing outliers
+
+# Compute the 25th percentile value in `tenure`
+percentile25 = df1['tenure'].quantile(0.25)
+
+# Compute the 75th percentile value in `tenure`
+percentile75 = df1['tenure'].quantile(0.75)
+
+# Compute the interquartile range in `tenure`
+iqr = percentile75 - percentile25
+
+# Define the upper limit and lower limit for non-outlier values in `tenure`
+upper_limit = percentile75 + 1.5 * iqr
+lower_limit = percentile25 - 1.5 * iqr
+print("Lower limit:", lower_limit)
+print("Upper limit:", upper_limit)
+
+# Identify subset of data containing outliers in `tenure`
+outliers = df1[(df1['tenure'] > upper_limit) | (df1['tenure'] < lower_limit)]
+
+# Count how many rows in the data contain outliers in `tenure`
+print("Number of rows in the data containing outliers in `tenure`:", len(outliers))
+```
+![tenure](https://github.com/ImanBrjn/python_Salifort_Motors/assets/140934258/e344b9a2-5f2e-43cb-aca6-5f80befd810a)    
+
