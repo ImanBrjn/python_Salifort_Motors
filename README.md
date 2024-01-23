@@ -76,7 +76,8 @@ df0 = pd.read_csv("HR_capstone_dataset.csv")
 df0.head()
 ```
 	satisfaction_level	last_evaluation	number_project	average_montly_hours	time_spend_company	Work_accident	left	promotion_last_5years	Department	salary
-0	0.38	0.53	2	157	3	0	1	0	sales	low
+| ----------- | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- | ----------- |
+| 0 | 0.38 | 0.53 | 2 | 157 | 3 | 0 | 1	| 0 | sales | low |
 1	0.80	0.86	5	262	6	0	1	0	sales	medium
 2	0.11	0.88	7	272	4	0	1	0	sales	medium
 3	0.72	0.87	5	223	5	0	1	0	sales	low
