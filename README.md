@@ -106,3 +106,11 @@ df0.describe()
 |max|1.000000|1.000000|7.000000|310.000000|10.000000|1.000000|1.000000|1.000000|
 
 The description indicates:
+1. All counts are the same (14999), which means there are no missing values.
+2. The minimum of satisfaction_level indicates that some employees are not happy with their job. However, the mean of this column indicates that, overall, employees are roughly satisfied with their job.
+3. The mean of last_evaluation indicates that, overall, employees are performing well.
+4. The mean of average_montly_hours shows that employees work an average of 210 hours per month, which is higher than the normal working hours of 175 hours.
+5. All employees have worked at the company for at least 2 years, indicating there are no interns in the data.
+6. The rate of Work_accident is 14%. Although this rate might seem low at first glance, workplace accidents can be serious or even lethal. Hence, the HSSE (Health, Safety, Security, and Environment) department needs to come up with plans to reduce this rate.
+7. In every 100 employees, 24 of them left the company. This is an alert for the company.
+8. The promotion rate is low. Although the satisfaction level of employees is high, they did not receive enough promotions to encourage them.
