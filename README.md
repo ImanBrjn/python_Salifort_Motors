@@ -1,5 +1,4 @@
-
-    # **Capstone project: Providing data-driven suggestions for HR**
+# **Capstone project: Providing data-driven suggestions for HR**
 
 ## Description and deliverables
 
