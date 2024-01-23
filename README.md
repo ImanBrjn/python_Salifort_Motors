@@ -31,7 +31,7 @@ Department|The employee's department
 salary|The employee's salary (U.S. dollars)
 ## Step 1. Imports
 *   First let's import requaired packages.
-### Import packages
+### Importinh packages
 ```
 # Import packages
 
@@ -65,7 +65,7 @@ from sklearn.tree import plot_tree
 # For saving models
 import pickle
 ```
-### Load dataset
+### Loading dataset
 `Pandas` is used to read a dataset called **`HR_capstone_dataset.csv`.**  
 ```
 # Load dataset into a dataframe
@@ -81,3 +81,28 @@ df0.head()
 |2|0.11|0.88|7|272|4|0|1|0|sales|medium|
 |3|0.72|0.87|5|223|5|0|1|0|sales|low|
 |4|0.37|0.52|2|159|3|0|1|0|sales|low|
+## Step 2. Data Exploration (Initial EDA and data cleaning)
+Now that the data has been loaded, it's time to understand the variables and clean the dataset.
+```
+# Gather basic information about the data
+df0.info()
+```
+![class](https://github.com/ImanBrjn/python_Salifort_Motors/assets/140934258/ae9d1557-d62a-4592-85bf-fc4c10b95929)
+The info indicates that `Department` and `salary` are objects, which might be categorical variables. We will further investigate this later. Additionally, the dataset should not contain any missing values.
+### Gathering descriptive statistics about the data
+```
+# Gather descriptive statistics about the data
+df0.describe()
+```
+| |satisfaction_level|last_evaluation|number_project|average_montly_hours|time_spend_company|Work_accident|left|promotion_last_5years|
+|:----|:----|:----|:----|:----|:----|:----|:----|:----|
+|count|14999.000000|14999.000000|14999.000000|14999.000000|14999.000000|14999.000000|14999.000000|14999.000000|
+|mean|0.612834|0.716102|3.803054|201.050337|3.498233|0.144610|0.238083|0.021268|
+|std|0.248631|0.171169|1.232592|49.943099|1.460136|0.351719|0.425924|0.144281|
+|min|0.090000|0.360000|2.000000|96.000000|2.000000|0.000000|0.000000|0.000000|
+|25%|0.440000|0.560000|3.000000|156.000000|3.000000|0.000000|0.000000|0.000000|
+|50%|0.640000|0.720000|4.000000|200.000000|3.000000|0.000000|0.000000|0.000000|
+|75%|0.820000|0.870000|5.000000|245.000000|4.000000|0.000000|0.000000|0.000000|
+|max|1.000000|1.000000|7.000000|310.000000|10.000000|1.000000|1.000000|1.000000|
+
+The description indicates:
