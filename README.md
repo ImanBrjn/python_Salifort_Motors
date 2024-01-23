@@ -1,273 +1,32 @@
-# **Capstone project: Providing data-driven suggestions for HR**
-
-## Description and deliverables
-In this capstone project, I will analyze a dataset and build predictive models to provide insights to the Human Resources (HR) department of a large consulting firm.   
-For my deliverables, I will include the model evaluation (and interpretation if applicable), data visualizations directly related to the questions asked, ethical considerations, and the resources I used to troubleshoot and find answers or solutions. For This case study I'm using Python to conduct an EDA.
-# **PACE stages**
-![pace](https://github.com/ImanBrjn/python_Salifort_Motors/assets/140934258/8bc00ccd-4772-4341-b5ef-13d441fc8dcf)
-## **Pace: Plan**
-Considering the questions in the PACE Strategy Document to reflect on the Plan stage, I will consider the following:
-### Understand the business scenario and problem
-The HR department at Salifort Motors wants to take some initiatives to improve employee satisfaction levels at the company. They have collected data from employees, but now they don’t know what to do with it. They have approached me, a data analytics professional, and requested data-driven suggestions based on my understanding of the data. They have a specific question: what’s likely to make an employee leave the company?   
-My goals in this project are to analyze the data collected by the HR department and build a model that predicts whether or not an employee will leave the company.   
-If I can predict employees likely to quit, it might be possible to identify factors that contribute to their departure. Because finding, interviewing, and hiring new employees is time-consuming and expensive, increasing employee retention would be beneficial to the company.
-### Familiarizing with the HR dataset
-
-The dataset that T'll be using in this case study contains 15,000 rows and 10 columns for the variables listed below. 
-
-**Note:** For more information about the data, refer to its source on [Kaggle](https://www.kaggle.com/datasets/mfaisalqureshi/hr-analytics-and-job-prediction?select=HR_comma_sep.csv).
-
-Variable  |Description |
------|-----|
-satisfaction_level|Employee-reported job satisfaction level [0&ndash;1]|
-last_evaluation|Score of employee's last performance review [0&ndash;1]|
-number_project|Number of projects employee contributes to|
-average_monthly_hours|Average number of hours employee worked per month|
-time_spend_company|How long the employee has been with the company (years)
-Work_accident|Whether or not the employee experienced an accident while at work
-left|Whether or not the employee left the company
-promotion_last_5years|Whether or not the employee was promoted in the last 5 years
-Department|The employee's department
-salary|The employee's salary (U.S. dollars)
-## Step 1. Imports
-*   First let's import requaired packages.
-### Importinh packages
-```
-# Import packages
-
-# For data manipulation
-import numpy as np
-import pandas as pd
-
-# For data visualization
-import matplotlib.pyplot as plt
-import seaborn as sns
-
-# For displaying all of the columns in dataframes
-pd.set_option('display.max_columns', None)
-
-# For data modeling
-from xgboost import XGBClassifier
-from xgboost import XGBRegressor
-from xgboost import plot_importance
-
-from sklearn.linear_model import LogisticRegression
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.ensemble import RandomForestClassifier
-
-# For metrics and helpful functions
-from sklearn.model_selection import GridSearchCV, train_test_split
-from sklearn.metrics import accuracy_score, precision_score, recall_score,\
-f1_score, confusion_matrix, ConfusionMatrixDisplay, classification_report
-from sklearn.metrics import roc_auc_score, roc_curve
-from sklearn.tree import plot_tree
-
-# For saving models
-import pickle
-```
-### Loading dataset
-`Pandas` is used to read a dataset called **`HR_capstone_dataset.csv`.**  
-```
-# Load dataset into a dataframe
-df0 = pd.read_csv("HR_capstone_dataset.csv")
-
-
-# Display first few rows of the dataframe
-df0.head()
-```
-|satisfaction_level|last_evaluation|number_project|average_montly_hours|time_spend_company|Work_accident|left|promotion_last_5years|Department|salary|
-|:----|:----|:----|:----|:----|:----|:----|:----|:----|:----|
-|1|0.80|0.86|5|262|6|0|1|0|sales|medium|
-|2|0.11|0.88|7|272|4|0|1|0|sales|medium|
-|3|0.72|0.87|5|223|5|0|1|0|sales|low|
-|4|0.37|0.52|2|159|3|0|1|0|sales|low|
-## Step 2. Data Exploration (Initial EDA and data cleaning)
-Now that the data has been loaded, it's time to understand the variables and clean the dataset.
-```
-# Gather basic information about the data
-df0.info()
-```
-![class](https://github.com/ImanBrjn/python_Salifort_Motors/assets/140934258/ae9d1557-d62a-4592-85bf-fc4c10b95929)    
-The info indicates that `Department` and `salary` are objects, which might be categorical variables. We will further investigate this later. Additionally, the dataset should not contain any missing values.
-### Gathering descriptive statistics about the data
-```
-# Gather descriptive statistics about the data
-df0.describe()
-```
-| |satisfaction_level|last_evaluation|number_project|average_montly_hours|time_spend_company|Work_accident|left|promotion_last_5years|
-|:----|:----|:----|:----|:----|:----|:----|:----|:----|
-|count|14999.000000|14999.000000|14999.000000|14999.000000|14999.000000|14999.000000|14999.000000|14999.000000|
-|mean|0.612834|0.716102|3.803054|201.050337|3.498233|0.144610|0.238083|0.021268|
-|std|0.248631|0.171169|1.232592|49.943099|1.460136|0.351719|0.425924|0.144281|
-|min|0.090000|0.360000|2.000000|96.000000|2.000000|0.000000|0.000000|0.000000|
-|25%|0.440000|0.560000|3.000000|156.000000|3.000000|0.000000|0.000000|0.000000|
-|50%|0.640000|0.720000|4.000000|200.000000|3.000000|0.000000|0.000000|0.000000|
-|75%|0.820000|0.870000|5.000000|245.000000|4.000000|0.000000|0.000000|0.000000|
-|max|1.000000|1.000000|7.000000|310.000000|10.000000|1.000000|1.000000|1.000000|
-
-The description indicates:
-1. All counts are the same (14999), which means there are no missing values.
-2. The minimum of satisfaction_level indicates that some employees are not happy with their job. However, the mean of this column indicates that, overall, employees are roughly satisfied with their job.
-3. The mean of last_evaluation indicates that, overall, employees are performing well.
-4. The mean of average_montly_hours shows that employees work an average of 210 hours per month, which is higher than the normal working hours of 175 hours.
-5. All employees have worked at the company for at least 2 years, indicating there are no interns in the data.
-6. The rate of Work_accident is 14%. Although this rate might seem low at first glance, workplace accidents can be serious or even lethal. Hence, the HSSE (Health, Safety, Security, and Environment) department needs to come up with plans to reduce this rate.
-7. In every 100 employees, 24 of them left the company. This is an alert for the company.
-8. The promotion rate is low. Although the satisfaction level of employees is high, they did not receive enough promotions to encourage them.
-### Renaming columns
-As a data cleaning step, let's rename the columns as needed. This involves standardizing the column names so that they are all in `snake_case`, correcting any misspelled column names, and making column names more concise as needed. The `snake_case `is a variable naming convention where each word is in lower case and separated by underscores.
-```
-# Display all column names
-df0.columns
-```
-![index](https://github.com/ImanBrjn/python_Salifort_Motors/assets/140934258/58f6fa5d-0a5a-47f0-a09e-15064e9ad088)
-```
-# Rename columns as needed
-
-df0 = df0.rename(columns={'Work_accident': 'work_accident',
-                          'average_montly_hours': 'average_monthly_hours',
-                          'time_spend_company': 'tenure',
-                          'Department': 'department'})
-
-# Display all column names after the update
-
-df0.columns
-```
-![index2](https://github.com/ImanBrjn/python_Salifort_Motors/assets/140934258/bf904d20-adee-4b6f-8979-5c152c560b9c)
-
-### Checking for missing values
-
-We already know that there are no missing values. However, it's worth checking for any missing values anyway.
-```
-# Check for missing values
-df0.isna().sum()
-```
-![missing](https://github.com/ImanBrjn/python_Salifort_Motors/assets/140934258/265f0e9c-ec30-4c01-80c1-1d8253c3bf43)
-### Checking for duplicates
-Now let's check for any duplicate entries in the data.
-```
-# Check for duplicates
-df0.duplicated().sum()
-```
-`3008`   
-3,008 rows contain duplicates. That is 20% of the data.
-```
-# Inspect some containing duplicates as needed
-df0_duplicated = df0[df0.duplicated() == True]
-df0_duplicated
-```
-| |satisfaction_level|last_evaluation|number_project|average_monthly_hours|tenure|work_accident|left|promotion_last_5years|department|salary|
-|:----|:----|:----|:----|:----|:----|:----|:----|:----|:----|:----|
-|396|0.46|0.57|2|139|3|0|1|0|sales|low|
-|866|0.41|0.46|2|128|3|0|1|0|accounting|low|
-|1317|0.37|0.51|2|127|3|0|1|0|sales|medium|
-|1368|0.41|0.52|2|132|3|0|1|0|RandD|low|
-|1461|0.42|0.53|2|142|3|0|1|0|sales|low|
-|...|...|...|...|...|...|...|...|...|...|...|
-|14994|0.40|0.57|2|151|3|0|1|0|support|low|
-|14995|0.37|0.48|2|160|3|0|1|0|support|low|
-|14996|0.37|0.53|2|143|3|0|1|0|support|low|
-|14997|0.11|0.96|6|280|4|0|1|0|support|low|
-|14998|0.37|0.52|2|158|3|0|1|0|support|low|
-Now let's check for any duplicate entries in the data. The output shows the first five occurrences of rows that are duplicated farther down in the dataframe. How likely is it that these are legitimate entries? In other words, how plausible is it that two employees self-reported the exact same response for every column? With several continuous variables across 10 columns, it seems very unlikely that these observations are legitimate. Let's proceed by dropping them. But first, I want to check if we drop the duplicates, is the dataset going to be imbalanced.
-```
-# Checking duplicates for each category in left column
-df0_duplicated['left'].value_counts()
-```
-![duplicate](https://github.com/ImanBrjn/python_Salifort_Motors/assets/140934258/50cf8d9f-72cb-426c-b79e-81bf0d77c10d)    
-This shows that both of the classes have fairly similar duplicates.
-```
-# Drop duplicates and save resulting dataframe in a new variable as needed
-df1 = df0.drop_duplicates(keep='first')
-
-# Display first few rows of new dataframe as needed
-df1.head()
-```
-| |satisfaction_level|last_evaluation|number_project|average_monthly_hours|tenure|work_accident|left|promotion_last_5years|department|salary|
-|:----|:----|:----|:----|:----|:----|:----|:----|:----|:----|:----|
-|0|0.38|0.53|2|157|3|0|1|0|sales|low|
-|1|0.80|0.86|5|262|6|0|1|0|sales|medium|
-|2|0.11|0.88|7|272|4|0|1|0|sales|medium|
-|3|0.72|0.87|5|223|5|0|1|0|sales|low|
-|4|0.37|0.52|2|159|3|0|1|0|sales|low|
-
-Even though there are chances to have completely the same information with different employees, since we don't have identification info and we don't know if they are truly the same person, we still dropped the duplicates for the following reasons:
-
-1. We will still have 11991 data after we dropped the duplicates.
-2. Both of the classes have the duplicates, dropping the rows won't have a serious impact on the balance of the dataset.
-3. In order to keep our model more fair, dropping the duplicates is going to be better than not dropping them.
-
-### Checking for outliers
-```
-# Create a boxplot to visualize distribution of `tenure` and detect any outliers
-plt.figure(figsize=(6,6))
-plt.title('Boxplot to detect outliers for tenure', fontsize=12)
-plt.xticks(fontsize=12)
-plt.yticks(fontsize=12)
-sns.boxplot(x=df1['tenure'])
-plt.show()
-```
-![outlier](https://github.com/ImanBrjn/python_Salifort_Motors/assets/140934258/a967ace3-1a98-4c75-beed-6bbeb826570a)   
-
-The boxplot above shows that there are outliers in the `tenure` variable.
-It would be helpful to investigate how many rows in the data contain outliers in the `tenure` column.
-```
-# Determining the number of rows containing outliers
-
-# Compute the 25th percentile value in `tenure`
-percentile25 = df1['tenure'].quantile(0.25)
-
-# Compute the 75th percentile value in `tenure`
-percentile75 = df1['tenure'].quantile(0.75)
-
-# Compute the interquartile range in `tenure`
-iqr = percentile75 - percentile25
-
-# Define the upper limit and lower limit for non-outlier values in `tenure`
-upper_limit = percentile75 + 1.5 * iqr
-lower_limit = percentile25 - 1.5 * iqr
-print("Lower limit:", lower_limit)
-print("Upper limit:", upper_limit)
-
-# Identify subset of data containing outliers in `tenure`
-outliers = df1[(df1['tenure'] > upper_limit) | (df1['tenure'] < lower_limit)]
-
-# Count how many rows in the data contain outliers in `tenure`
-print("Number of rows in the data containing outliers in `tenure`:", len(outliers))
-```
-![tenure](https://github.com/ImanBrjn/python_Salifort_Motors/assets/140934258/e344b9a2-5f2e-43cb-aca6-5f80befd810a)    
-
 
     # **Capstone project: Providing data-driven suggestions for HR**
 
 ## Description and deliverables
 
 In this capstone project, I will analyze a dataset and build predictive models that can provide insights to the Human Resources (HR) department of a large consulting firm.
-
-In my deliverables, I will include the model evaluation (and interpretation if applicable), a data visualization(s) which is directly related to the question asked, ethical considerations, and the resources I used to troubleshoot and find answers or solutions.
+My deliverables will include model evaluation (and interpretation if applicable), data visualizations directly related to the question asked, ethical considerations, and a list of resources I used to troubleshoot and find answers or solutions.
 
 
 # **PACE stages**
 
+![pace](https://github.com/ImanBrjn/python_Salifort_Motors/assets/140934258/1ecb8a7a-4c24-4eb6-83d2-801e3588269b)
 
 
 ## **Pace: Plan**
 
-Considering the questions in the PACE Strategy Document to reflect on the Plan stage.
+Considering the questions in the PACE Strategy Document to reflect on the Plan stage, I will consider the following:
 
-In this stage, I will consider the following:
+### Understanding the business scenario and problem
 
-### Understand the business scenario and problem
+The HR department at Salifort Motors wants to improve employee satisfaction levels by leveraging the collected data. They seek data-driven suggestions to understand what factors may contribute to employees leaving the company. My goal in this project is to analyze the provided data and build a predictive model to identify employees who are likely to quit. By predicting potential departures, the company can take proactive measures to address contributing factors and improve employee retention. This approach aims to save time and resources associated with recruiting and hiring new employees.
 
-The HR department at Salifort Motors wants to take some initiatives to improve employee satisfaction levels at the company. They collected data from employees, but now they don’t know what to do with it. They refer to me as a data analytics professional and ask to provide data-driven suggestions based on my understanding of the data. They have the following question: what’s likely to make the employee leave the company?
+If I can predict employees likely to quit, it might be possible to identify factors that contribute to their leaving. Because it is time-consuming and expensive to find, interview, and hire new employees, increasing employee retention will be beneficial to the company..
 
-My goals in this project are to analyze the data collected by the HR department and to build a model that predicts whether or not an employee will leave the company.
-
-If I can predict employees likely to quit, it might be possible to identify factors that contribute to their leaving. Because it is time-consuming and expensive to find, interview, and hire new employees, increasing employee retention will be beneficial to the company.
+Identifying employees likely to quit through predictive modeling can help uncover the contributing factors to their departure. Given the time-consuming and costly nature of finding, interviewing, and hiring new employees, improving employee retention would be advantageous for the company.
 
 ### Familiarizing with the HR dataset
 
-The dataset that T'll be using in this case study contains 15,000 rows and 10 columns for the variables listed below. 
+The dataset for this case study comprises 15,000 rows and includes 10 columns corresponding to the following variables. 
 
 **Note:** For more information about the data, refer to its source on [Kaggle](https://www.kaggle.com/datasets/mfaisalqureshi/hr-analytics-and-job-prediction?select=HR_comma_sep.csv).
 
@@ -284,26 +43,13 @@ promotion_last_5years|Whether or not the employee was promoted in the last 5 yea
 Department|The employee's department
 salary|The employee's salary (U.S. dollars)
 
-💭
-### Let's answer some question on the plan stage.
-
-*  Who are your stakeholders for this project?
-**Salifort’s manager**: Who is concerned about how many employees are leaving the company and wants to identify factors that contribute to their leaving.
-**Human Resources**: Who survey a sample of employees to learn more about what might be driving turnover.
-**Data analytics leader**: Who ask me to analyze the survey data and come up with ideas for how to increase employee retention. They also suggest us design a model that predicts whether an employee will leave the company based on their job title, department, number of projects, average monthly hours, and any other relevant data points.
-- What am I trying to solve or accomplish?
-The purpose is to identify factors that contribute to their leaving. 
-- What are initial observations when exploring the data?
-Let's findout by analysing the data step by step.
-
 
 ## Step 1. Imports
 
 *   First let's import requaired packages.
 
 
-
-### Import packages
+### Importing packages
 
 
 ```python
@@ -342,7 +88,7 @@ import pickle
 
 ### Load dataset
 
-`Pandas` is used to read a dataset called **`HR_capstone_dataset.csv`.**  
+The dataset named **`HR_capstone_dataset.csv`** is read using the `Pandas` library. 
 
 
 ```python
@@ -464,7 +210,7 @@ df0.head()
 
 ## Step 2. Data Exploration (Initial EDA and data cleaning)
 
-Now that aut data has benn loaded. it's time to understand variables and clean the dataset
+Now that the data has been loaded, it's time to understand the variables and clean the dataset.
 
 
 
@@ -494,9 +240,9 @@ df0.info()
     memory usage: 1.1+ MB
 
 
-The info indicates that `Department` and `salary` are objects which might be categorical variables, we will figure it out later. In addition, it should not contain the missing value.
+The info indicates that `Department` and `salary` are objects, which might be categorical variables. We will figure that out later. Additionally, it shows that there are no missing values in the dataset.
 
-### Gather descriptive statistics about the data
+### Gathering descriptive statistics about the data
 
 
 ```python
@@ -630,19 +376,20 @@ df0.describe()
 
 
 
-The description indicates:
-1- All counts are same (14999), which means there is no missing values.
-2- The minimum of `satisfaction_level` indicates there are  some employees that not happy with their job. But the mean of this columns indicates that overal employees are roughly statisfied with thier job. 
-3- The mean of `last_evaluation` indicates in overall employees are working pretty well.
-4- The mean of `average_montly_hours` shows employees work at 210 hours per month which is hieghr than normal hours which is 175 hours. 
-5- All employees woked at company atleast 2 years.Hence there is no interns in the data.
-6- The rate of `Work_accident` is 14%. This rate might seems low at first glampse, but inccident in work might be serious or even leathal. Hence, HSSE department have to come up with some plans to reduce this rate.
-7- In every 100 employees, 24 of them left the company. This is an alart for company.
-8- Promote rate is low. ALthough saticfation level of employees are high, they did not get enough promotes to encorage them.
+The description indicates the following:
 
-### Rename columns
+1. All counts are the same (14999), which means there are no missing values.
+2. The minimum of `satisfaction_level` indicates that there are some employees who are not happy with their job. However, the mean of this column indicates that overall employees are roughly satisfied with their job.
+3. The mean of `last_evaluation` indicates that, overall, employees are performing well.
+4. The mean of `average_monthly_hours` shows that employees work an average of 210 hours per month, which is higher than the normal working hours of 175 hours.
+5. All employees worked at the company for at least 2 years; hence, there are no interns in the data.
+6. The rate of `Work_accident` is 14%. While this rate might seem low at first glance, workplace accidents can be serious or even lethal. Hence, the HSSE (Health, Safety, Security, and Environment) department needs to come up with plans to reduce this rate.
+7. In every 100 employees, 24 of them left the company. This is an alert for the company.
+8. The promotion rate is low. Although the satisfaction level of employees is high, they did not get enough promotions to encourage them.
 
-As a data cleaning step, let's rename the columns as needed. It contains standardizing the column names so that they are all in `snake_case`, correcting any column names that are misspelled, and makeing column names more concise as needed. The `snake_case` is a variable naming convention where each word is in lower case, and separated by underscores.
+### Renaming columns
+
+As a data cleaning step, let's rename the columns as needed. This involves standardizing the column names so that they are all in `snake_case`, correcting any misspelled column names, and making column names more concise as needed. `Snake_case` is a variable naming convention where each word is in lower case and separated by underscores.
 
 
 ```python
@@ -685,9 +432,9 @@ df0.columns
 
 
 
-### Check missing values
+### Checking for missing values
 
-We already know that there is no missing values. But it worth to check for any missing values anyway.
+We already know that there are no missing values. But it's worth checking for any missing values anyway.
 
 
 ```python
@@ -713,9 +460,9 @@ df0.isna().sum()
 
 
 
-### Check duplicates
+### Checking for duplicates
 
-Noe let's sheck for any duplicate entries in the data.
+Now let's check for any duplicate entries in the data.
 
 
 ```python
@@ -731,7 +478,7 @@ df0.duplicated().sum()
 
 
 
-3,008 rows contain duplicates. That is 20% of the data.
+The output shows that there are 3,008 rows containing duplicates. That is 20% of the data.
 
 
 ```python
@@ -925,7 +672,7 @@ df0_duplicated
 
 
 
-The above output shows the first five occurences of rows that are duplicated farther down in the dataframe. How likely is it that these are legitimate entries? In other words, how plausible is it that two employees self-reported the exact same response for every column?. With several continuous variables across 10 columns, it seems very unlikely that these observations are legitimate. Let's procee by dropping them. But first I want to check if we drop the duplicates, is the dataset going to be imbalanced.
+The output shows the first five occurrences of rows that are duplicated farther down in the dataframe. How likely is it that these are legitimate entries? In other words, how plausible is it that two employees self-reported the exact same response for every column? With several continuous variables across 10 columns, it seems very unlikely that these observations are legitimate. Let's proceed by dropping them. But first, I want to check if we drop the duplicates, is the dataset going to be imbalanced.
 
 
 ```python
@@ -942,7 +689,7 @@ df0_duplicated['left'].value_counts()
 
 
 
-This shows both of the classes have fairly similar duplicates.
+This shows that both classes have fairly similar duplicates.
 
 
 ```python
@@ -1058,15 +805,14 @@ df1.head()
 
 
 
-Even though there are chances to have completely the same information with different employees, since we don't have identification info and we don't know if they are truly the same person. We still dropped the duplicates for the following reasons:
+Even though there are chances to have completely the same information with different employees, since we don't have identification info and we don't know if they are truly the same person, we still dropped the duplicates for the following reasons:
 
-1- We will still have 11991 data after we dropped the duplicates.
+1- We will still have 11,991 data after we dropped the duplicates.
 2- Both of the classes have the duplicates, dropping the rows won't have a serious impact on the balance of the dataset.
-3- In order to keep our model more fair, dropping the duplicates is going to be better than not to drop them.
+3- In order to keep our model more fair, dropping the duplicates is going to be better than not dropping them.
 
-### Check outliers
+### Checking for outliers
 
-Check for outliers in the data.
 
 
 ```python
@@ -1081,11 +827,14 @@ plt.show()
 ```
 
 
-![png](output_38_0.png)
+![png](output_38_0.png)   
 
 
-The boxplot above shows that there are outliers in the `tenure` variable. 
-It would be helpful to investigate how many rows in the data contain outliers in the `tenure` column.
+The boxplot above shows that there are outliers in the `tenure` variable. It would be helpful to investigate how many rows in the data contain outliers in the `tenure` column.   
+
+In this capstone project, I will analyze a dataset and build predictive models that can provide insights to the Human Resources (HR) department of a large consulting firm.   
+
+In my deliverables, I will include the model evaluation (and interpretation if applicable), a data visualization(s) which is directly related to the question asked, ethical considerations, and the resources I used to troubleshoot and find answers or solutions.
 
 
 ```python
@@ -1120,29 +869,15 @@ print("Number of rows in the data containing outliers in `tenure`:", len(outlier
     Number of rows in the data containing outliers in `tenure`: 824
 
 
-Certain types of models are more sensitive to outliers than others. When we get to the stage of building model, we should consider whether to remove outliers, based on the type of model we decide to use.
+Certain types of models are more sensitive to outliers than others. When we get to the stage of building a model, we should consider whether to remove outliers based on the type of model we decide to use.
 
 # pAce: Analyze Stage
 - Performing EDA (analyze relationships between variables)
 
 
-
-💭
-### Reflect on these questions as you complete the analyze stage.
-
-- What did you observe about the relationships between variables?
-- What do you observe about the distributions in the data?
-- What transformations did you make with your data? Why did you chose to make those decisions?
-- What are some purposes of EDA before constructing a predictive model?
-- What resources do you find yourself using as you complete this stage? (Make sure to include the links.)
-- Do you have any ethical considerations in this stage?
-
-
-
-
 ## Step 2. Data Exploration (Continue EDA)
 
-Begining by understanding how many employees left and what percentage of all employees this figure represents.
+Beginning by understanding how many employees left and what percentage of all employees this figure represents.
 
 
 ```python
@@ -1165,9 +900,9 @@ print(df1['left'].value_counts(normalize=True))
 
 ### Data visualizations
 
-Now, let's examine variables and create plots to visualize relationships between variables in the data.
-
-Start by creating a stacked boxplot showing `average_monthly_hours` distributions for `number_project`, comparing the distributions of employees who stayed versus those who left.
+Now, let's examine variables and create plots to visualize relationships between variables in the data.   
+   
+Start by creating a stacked boxplot showing the distribution of `average_monthly_hours` for different `number_project` categories, comparing the distributions of employees who stayed versus those who left.   
 
 Box plots are very useful in visualizing distributions within data, but they can be deceiving without the context of how big the sample sizes that they represent are. So, we could also plot a stacked histogram to visualize the distribution of `number_project` for those who stayed and those who left.
 
@@ -1195,19 +930,19 @@ plt.show()
 ```
 
 
-![png](output_48_0.png)
+![png](output_48_0.png)   
 
 
-It might be natural that people who work on more projects would also work longer hours. This appears to be the case here, with the mean hours of each group (stayed and left) increasing with number of projects worked. However, a few things stand out from this plot.
+It might be natural that people who work on more projects would also work longer hours. This appears to be the case here, with the mean hours of each group (stayed and left) increasing with the number of projects worked. However, a few things stand out from this plot.   
+   
+1. There are two groups of employees who left the company: (A) those who worked considerably less than their peers with the same number of projects, and (B) those who worked much more. Of those in group A, it's possible that they were fired. It's also possible that this group includes employees who had already given their notice and were assigned fewer hours because they were already on their way out the door. For those in group B, it's reasonable to infer that they probably quit. The folks in group B likely contributed a lot to the projects they worked in; they might have been the largest contributors to their projects.
 
-1. There are two groups of employees who left the company: (A) those who worked considerably less than their peers with the same number of projects, and (B) those who worked much more. Of those in group A, it's possible that they were fired. It's also possible that this group includes employees who had already given their notice and were assigned fewer hours because they were already on their way out the door. For those in group B, it's reasonable to infer that they probably quit. The folks in group B likely contributed a lot to the projects they worked in; they might have been the largest contributors to their projects. 
+2. Everyone with seven projects left the company, and the interquartile ranges of this group and those who left with six projects were ~255–295 hours/month—much more than any other group.
 
-2. Everyone with seven projects left the company, and the interquartile ranges of this group and those who left with six projects was ~255&ndash;295 hours/month&mdash;much more than any other group. 
+3. The optimal number of projects for employees to work on seems to be 3–4. The ratio of left/stayed is very small for these cohorts.
 
-3. The optimal number of projects for employees to work on seems to be 3&ndash;4. The ratio of left/stayed is very small for these cohorts.
-
-4. If we assume a work week of 40 hours and two weeks of vacation per year, then the average number of working hours per month of employees working Monday&ndash;Friday `= 50 weeks * 40 hours per week / 12 months = 166.67 hours per month`. This means that, aside from the employees who worked on two projects, every group&mdash;even those who didn't leave the company&mdash;worked considerably more hours than this. It seems that employees here are overworked.
-
+4. If we assume a work week of 40 hours and two weeks of vacation per year, then the average number of working hours per month of employees working Monday–Friday `= 50 weeks * 40 hours per week / 12 months = 166.67 hours per month`. This means that, aside from the employees who worked on two projects, every group—even those who didn't leave the company—worked considerably more hours than this. It seems that employees here are overworked.   
+   
 As the next step, we could confirm that all employees with seven projects left.
 
 
@@ -1225,9 +960,9 @@ df1[df1['number_project']==7]['left'].value_counts()
 
 
 
-This confirms that all employees with 7 projects did leave. 
-
-Next, we could examine the average monthly hours versus the satisfaction levels. 
+This confirms that all employees with 7 projects did leave.    
+     
+Next, we could examine the average monthly hours versus the satisfaction levels.
 
 
 ```python
@@ -1242,17 +977,17 @@ plt.title('Monthly hours by last evaluation score', fontsize='14');
 ```
 
 
-![png](output_52_0.png)
+![png](output_52_0.png)   
 
 
-The scatterplot above shows that there was a sizeable group of employees who worked ~240&ndash;315 hours per month. 315 hours per month is over 75 hours per week for a whole year. It's likely this is related to their satisfaction levels being close to zero. 
+The scatterplot above shows that there was a sizeable group of employees who worked around 240–315 hours per month. 315 hours per month is over 75 hours per week for a whole year. It's likely this is related to their satisfaction levels being close to zero.   
 
-The plot also shows another group of people who left, those who had more normal working hours. Even so, their satisfaction was only around 0.4. It's difficult to speculate about why they might have left. It's possible they felt pressured to work more, considering so many of their peers worked more. And that pressure could have lowered their satisfaction levels. 
+The plot also shows another group of people who left, those who had more normal working hours. Even so, their satisfaction was only around 0.4. It's difficult to speculate about why they might have left. It's possible they felt pressured to work more, considering so many of their peers worked more. And that pressure could have lowered their satisfaction levels.   
 
-Finally, there is a group who worked ~210&ndash;280 hours per month, and they had satisfaction levels ranging ~0.7&ndash;0.9. 
+Finally, there is a group who worked around 210–280 hours per month, and they had satisfaction levels ranging around 0.7–0.9.   
 
-The strange shape of the distributions is indicative of data manipulation or synthetic data.
-
+The strange shape of the distributions is indicative of data manipulation or synthetic data.   
+   
 For the next visualization, it might be interesting to visualize satisfaction levels by tenure.
 
 
@@ -1277,15 +1012,15 @@ plt.show();
 ```
 
 
-![png](output_54_0.png)
+![png](output_54_0.png)   
 
 
-There are many observations we could make from this plot.
-- Employees who left fall into two general categories: dissatisfied employees with shorter tenures and very satisfied employees with medium-length tenures.
-- Four-year employees who left seem to have an unusually low satisfaction level. It's worth investigating changes to company policy that might have affected people specifically at the four-year mark, if possible. 
-- The longest-tenured employees didn't leave. Their satisfaction levels aligned with those of newer employees who stayed. 
-- The histogram shows that there are relatively few longer-tenured employees. It's possible that they're the higher-ranking, higher-paid employees.
-
+There are many observations we could make from this plot.   
+- Employees who left fall into two general categories: dissatisfied employees with shorter tenures and very satisfied employees with medium-length tenures.   
+- Four-year employees who left seem to have an unusually low satisfaction level. It's worth investigating changes to company policy that might have affected people specifically at the four-year mark, if possible.   
+- The longest-tenured employees didn't leave. Their satisfaction levels aligned with those of newer employees who stayed.   
+- The histogram shows that there are relatively few longer-tenured employees. It's possible that they're the higher-ranking, higher-paid employees.   
+   
 As the next step in analyzing the data, we could calculate the mean and median satisfaction scores of employees who left and those who didn't.
 
 
@@ -1342,8 +1077,8 @@ df1.groupby(['left'])['satisfaction_level'].agg([np.mean,np.median])
 
 
 
-As expected, the mean and median satisfaction scores of employees who left are lower than those of employees who stayed. Interestingly, among employees who stayed, the mean satisfaction score appears to be slightly below the median score. This indicates that satisfaction levels among those who stayed might be skewed to the left. 
-
+As expected, the mean and median satisfaction scores of employees who left are lower than those of employees who stayed. Interestingly, among employees who stayed, the mean satisfaction score appears to be slightly below the median score. This indicates that satisfaction levels among those who stayed might be skewed to the left.   
+   
 Next, let's examine salary levels for different tenures.
 
 
@@ -1370,16 +1105,16 @@ ax[1].set_title('Salary histogram by tenure: long-tenured people', fontsize='14'
 ```
 
 
-![png](output_58_0.png)
+![png](output_58_0.png)   
 
 
-The plots above show that long-tenured employees were not disproportionately comprised of higher-paid employees. 
-
+The plots above show that long-tenured employees were not disproportionately comprised of higher-paid employees.   
+   
 Next, we could explore whether there's a correlation between working long hours and receiving high evaluation scores. Let's create a scatterplot of `average_monthly_hours` versus `last_evaluation`.
 
 
 ```python
-# Create a plot as needed
+
 # Create scatterplot of `average_monthly_hours` versus `last_evaluation`
 plt.figure(figsize=(16, 9))
 sns.scatterplot(data=df1, x='average_monthly_hours', y='last_evaluation', hue='left', alpha=0.4)
@@ -1390,15 +1125,15 @@ plt.title('Monthly hours by last evaluation score', fontsize='14');
 ```
 
 
-![png](output_60_0.png)
+![png](output_60_0.png)   
 
 
-The following observations can be made from the scatterplot above:
-- The scatterplot indicates two groups of employees who left: overworked employees who performed very well and employees who worked slightly under the nominal monthly average of 166.67 hours with lower evaluation scores. 
-- There seems to be a correlation between hours worked and evaluation score. 
-- There isn't a high percentage of employees in the upper left quadrant of this plot; but working long hours doesn't guarantee a good evaluation score.
-- Most of the employees in this company work well over 167 hours per month.
-
+The following observations can be made from the scatterplot above:   
+- The scatterplot indicates two groups of employees who left: overworked employees who performed very well and employees who worked slightly under the nominal monthly average of 166.67 hours with lower evaluation scores.   
+- There seems to be a correlation between hours worked and evaluation score.   
+- There isn't a high percentage of employees in the upper left quadrant of this plot; but working long hours doesn't guarantee a good evaluation score.   
+- Most of the employees in this company work well over 167 hours per month.   
+   
 Next, we could examine whether employees who worked very long hours were promoted in the last five years.
 
 
@@ -1413,14 +1148,14 @@ plt.title('Monthly hours by promotion last 5 years', fontsize='14');
 ```
 
 
-![png](output_62_0.png)
+![png](output_62_0.png)   
 
 
 The plot above shows the following:
-- very few employees who were promoted in the last five years left
-- very few employees who worked the most hours were promoted
-- all of the employees who left were working the longest hours  
-
+- very few employees who were promoted in the last five years left   
+- very few employees who worked the most hours were promoted   
+- all of the employees who left were working the longest hours     
+   
 Next, we could inspect how the employees who left are distributed across departments.
 
 
@@ -1458,11 +1193,11 @@ plt.title('Counts of stayed/left by department', fontsize=14);
 ```
 
 
-![png](output_65_0.png)
+![png](output_65_0.png)     
 
 
-There doesn't seem to be any department that differs significantly in its proportion of employees who left to those who stayed.
-
+There doesn't seem to be any department that differs significantly in its proportion of employees who left to those who stayed.   
+   
 Lastly, let's check for strong correlations between variables in the data.
 
 
@@ -1474,52 +1209,23 @@ heatmap.set_title('Correlation Heatmap', fontdict={'fontsize':14}, pad=12);
 ```
 
 
-![png](output_67_0.png)
+![png](output_67_0.png)   
 
 
-The correlation heatmap confirms that the number of projects, monthly hours, and evaluation scores all have some positive correlation with each other, and whether an employee leaves is negatively correlated with their satisfaction level.
+The correlation heatmap confirms that the number of projects, monthly hours, and evaluation scores all have some positive correlation with each other. Additionally, whether an employee leaves is negatively correlated with their satisfaction level.
 
 ### Insights
 
 It appears that employees are leaving the company as a result of poor management. Leaving is tied to longer working hours, many projects, and generally lower satisfaction levels. It can be ungratifying to work long hours and not receive promotions or good evaluation scores. There's a sizeable group of employees at this company who are probably burned out. It also appears that if an employee has spent more than six years at the company, they tend not to leave. 
 
 # paCe: Construct Stage
-In this stage we:
+In this stage I:
 - Determine which models are most appropriate
 - Construct the model
 - Confirm model assumptions
 - Evaluate model results to determine how well the model fits the data
 
 
-🔎
-## Recall model assumptions
-
-**Logistic Regression model assumptions**
-- Outcome variable is categorical
-- Observations are independent of each other
-- No severe multicollinearity among X variables
-- No extreme outliers
-- Linear relationship between each X variable and the logit of the outcome variable
-- Sufficiently large sample size
-
-
-
-
-
-💭
-### Reflect on these questions as you complete the constructing stage.
-
-- Do you notice anything odd?
-- Which independent variables did you choose for the model and why?
-- Are each of the assumptions met?
-- How well does your model fit the data?
-- Can you improve it? Is there anything you would change about the model?
-- What resources do you find yourself using as you complete this stage? (Make sure to include the links.)
-- Do you have any ethical considerations in this stage?
-
-
-
-[Double-click to enter your responses here.]
 
 ## Step 3 and 4. Model Building and Results and Evaluation
 - Fit a model that predicts the outcome variable using two or more independent variables
@@ -1846,7 +1552,7 @@ Next, we can write a function that will help extract all the scores from the gri
 def make_results(model_name:str, model_object, metric:str):
     '''
     Arguments:
-        model_name (string): what you want the model to be called in the output table
+        model_name (string): 
         model_object: a fit GridSearchCV object
         metric (string): precision, recall, f1, accuracy, or auc
   
@@ -2010,7 +1716,7 @@ Specifing path to save the model.
 
 
 ```python
-# Define a path to the folder where you want to save the model
+# Define a path to save the model
 path = '/home/jovyan/work/'
 ```
 
@@ -2021,9 +1727,9 @@ Defineing functions to pickle the model and read in the model.
 def write_pickle(path, model_object, save_as:str):
     '''
     In: 
-        path:         path of folder where you want to save the pickle
-        model_object: a model you want to pickle
-        save_as:      filename for how you want to save the model
+        path:         path of folder to save the pickle
+        model_object: a model  to pickle
+        save_as:      filename for how to save the model
 
     Out: A call to pickle the model in the folder indicated
     '''    
@@ -2034,8 +1740,8 @@ def write_pickle(path, model_object, save_as:str):
 def read_pickle(path, saved_model_name:str):
     '''
     In: 
-        path:             path to folder where you want to read from
-        saved_model_name: filename of pickled model you want to read in
+        path:             path to folder where  to read from
+        saved_model_name: filename of pickled model to read in
 
     Out: 
         model: the pickled model 
@@ -2110,7 +1816,7 @@ print(rf1_cv_results)
 
 The evaluation scores of the random forest model are better than those of the decision tree model, with the exception of recall (the recall score of the random forest model is approximately 0.001 lower, which is a negligible amount). This indicates that the random forest model mostly outperforms the decision tree model.
 
-Next, you can define a function that gets all the scores from a model's predictions.
+Next, we can define a function that gets all the scores from a model's predictions.
 
 
 ```python
@@ -2119,12 +1825,12 @@ def get_scores(model_name:str, model, X_test_data, y_test_data):
     Generate a table of test scores.
 
     In: 
-        model_name (string):  How you want your model to be named in the output table
+        model_name (string):  How model to be named in the output table
         model:                A fit GridSearchCV object
         X_test_data:          numpy array of X_test data
         y_test_data:          numpy array of y_test data
 
-    Out: pandas df of precision, recall, f1, accuracy, and AUC scores for your model
+    Out: pandas df of precision, recall, f1, accuracy, and AUC scores for model
     '''
 
     preds = model.best_estimator_.predict(X_test_data)
@@ -2200,10 +1906,10 @@ rf1_test_scores
 
 
 
-The test scores are very similar to the validation scores, which is good. This appears to be a strong model. Since this test set was only used for this model, we can be more confident that your model's performance on this data is representative of how it will perform on new, unseeen data.
+The test scores are very similar to the validation scores, which is good. This appears to be a strong model. Since this test set was only used for this model, we can be more confident that the model's performance on this data is representative of how it will perform on new, unseeen data.
 
 #### Feature Engineering
-I am skeptical of the high evaluation scores. There is a chance that there is some data leakage occurring. Data leakage is when we use data to train your model that should not be used during training, either because it appears in the test data or because it's not data that you'd expect to have when the model is actually deployed. Training a model with leaked data can give an unrealistic score that is not replicated in production.
+I am skeptical of the high evaluation scores. There is a chance that there is some data leakage occurring. Data leakage is when we use data to train the model that should not be used during training, either because it appears in the test data or because it's not data that I'd expect to have when the model is actually deployed. Training a model with leaked data can give an unrealistic score that is not replicated in production.
 
 In this case, it's likely that the company won't have satisfaction levels reported for all of its employees. It's also possible that the `average_monthly_hours` column is a source of some data leakage. If employees have already decided upon quitting, or have already been identified by management as people to be fired, they may be working fewer hours. 
 
@@ -2864,7 +2570,7 @@ disp.plot(values_format='');
 ```
 
 
-![png](output_145_0.png)
+![png](output_145_0.png)   
 
 
 The model predicts more false positives than false negatives, which means that some employees may be identified as at risk of quitting or getting fired, when that's actually not the case. But this is still a strong model.
@@ -2883,7 +2589,7 @@ plt.show()
 ```
 
 
-![png](output_148_0.png)
+![png](output_148_0.png)   
 
 
 
@@ -2987,7 +2693,7 @@ plt.show()
 ```
 
 
-![png](output_151_0.png)
+![png](output_151_0.png)   
 
 
 
@@ -3026,7 +2732,7 @@ plt.show()
 ```
 
 
-![png](output_154_0.png)
+![png](output_154_0.png)   
 
 
 The plot above shows that in this random forest model, `last_evaluation`, `number_project`, `tenure`, and `overworked` have the highest importance, in that order. These variables are most helpful in predicting the outcome variable, `left`, and they are the same as the ones used by the decision tree model.
@@ -3046,25 +2752,6 @@ The plot above shows that in this random forest model, `last_evaluation`, `numbe
 - **Accuracy** measures the proportion of data points that are correctly classified.
 - **F1-score** is an aggregation of precision and recall.
 
-
-
-
-
-
-💭
-### Reflect on these questions as you complete the executing stage.
-
-- What key insights emerged from your model(s)?
-- What business recommendations do you propose based on the models built?
-- What potential recommendations would you make to your manager/company?
-- Do you think your model could be improved? Why or why not? How?
-- Given what you know about the data and the models you were using, what other questions could you address for the team?
-- What resources do you find yourself using as you complete this stage? (Make sure to include the links.)
-- Do you have any ethical considerations in this stage?
-
-
-
-Double-click to enter your responses here.
 
 ## Step 4. Results and Evaluation
 - Interpret model
@@ -3094,6 +2781,5 @@ To retain employees, the following recommendations could be presented to the sta
 
 It may be justified to still have some concern about data leakage. It could be prudent to consider how predictions change when `last_evaluation` is removed from the data. It's possible that evaluations aren't performed very frequently, in which case it would be useful to be able to predict employee retention without this feature. It's also possible that the evaluation score determines whether an employee leaves or stays, in which case it could be useful to pivot and try to predict performance score. The same could be said for satisfaction score. 
 
-For another project, you could try building a K-means model on this data and analyzing the clusters. This may yield valuable insight. 
 
 **Thank you for taking the time to read my Capstone Project!**
