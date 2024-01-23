@@ -87,7 +87,7 @@ Now that the data has been loaded, it's time to understand the variables and cle
 # Gather basic information about the data
 df0.info()
 ```
-![class](https://github.com/ImanBrjn/python_Salifort_Motors/assets/140934258/ae9d1557-d62a-4592-85bf-fc4c10b95929)
+![class](https://github.com/ImanBrjn/python_Salifort_Motors/assets/140934258/ae9d1557-d62a-4592-85bf-fc4c10b95929)    
 The info indicates that `Department` and `salary` are objects, which might be categorical variables. We will further investigate this later. Additionally, the dataset should not contain any missing values.
 ### Gathering descriptive statistics about the data
 ```
@@ -114,3 +114,58 @@ The description indicates:
 6. The rate of Work_accident is 14%. Although this rate might seem low at first glance, workplace accidents can be serious or even lethal. Hence, the HSSE (Health, Safety, Security, and Environment) department needs to come up with plans to reduce this rate.
 7. In every 100 employees, 24 of them left the company. This is an alert for the company.
 8. The promotion rate is low. Although the satisfaction level of employees is high, they did not receive enough promotions to encourage them.
+### Renaming columns
+As a data cleaning step, let's rename the columns as needed. This involves standardizing the column names so that they are all in `snake_case`, correcting any misspelled column names, and making column names more concise as needed. The `snake_case `is a variable naming convention where each word is in lower case and separated by underscores.
+```
+# Display all column names
+df0.columns
+```
+![index](https://github.com/ImanBrjn/python_Salifort_Motors/assets/140934258/58f6fa5d-0a5a-47f0-a09e-15064e9ad088)
+```
+# Rename columns as needed
+
+df0 = df0.rename(columns={'Work_accident': 'work_accident',
+                          'average_montly_hours': 'average_monthly_hours',
+                          'time_spend_company': 'tenure',
+                          'Department': 'department'})
+
+# Display all column names after the update
+
+df0.columns
+```
+![index2](https://github.com/ImanBrjn/python_Salifort_Motors/assets/140934258/bf904d20-adee-4b6f-8979-5c152c560b9c)
+
+### Checking for missing values
+
+We already know that there are no missing values. However, it's worth checking for any missing values anyway.
+```
+# Check for missing values
+df0.isna().sum()
+```
+![missing](https://github.com/ImanBrjn/python_Salifort_Motors/assets/140934258/265f0e9c-ec30-4c01-80c1-1d8253c3bf43)
+### Checking for duplicates
+Now let's check for any duplicate entries in the data.
+```
+# Check for duplicates
+df0.duplicated().sum()
+```
+`3008`   
+3,008 rows contain duplicates. That is 20% of the data.
+```
+# Inspect some containing duplicates as needed
+df0_duplicated = df0[df0.duplicated() == True]
+df0_duplicated
+```
+| |satisfaction_level|last_evaluation|number_project|average_monthly_hours|tenure|work_accident|left|promotion_last_5years|department|salary|
+|:----|:----|:----|:----|:----|:----|:----|:----|:----|:----|:----|
+|396|0.46|0.57|2|139|3|0|1|0|sales|low|
+|866|0.41|0.46|2|128|3|0|1|0|accounting|low|
+|1317|0.37|0.51|2|127|3|0|1|0|sales|medium|
+|1368|0.41|0.52|2|132|3|0|1|0|RandD|low|
+|1461|0.42|0.53|2|142|3|0|1|0|sales|low|
+|...|...|...|...|...|...|...|...|...|...|...|
+|14994|0.40|0.57|2|151|3|0|1|0|support|low|
+|14995|0.37|0.48|2|160|3|0|1|0|support|low|
+|14996|0.37|0.53|2|143|3|0|1|0|support|low|
+|14997|0.11|0.96|6|280|4|0|1|0|support|low|
+|14998|0.37|0.52|2|158|3|0|1|0|support|low|
