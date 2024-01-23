@@ -169,3 +169,24 @@ df0_duplicated
 |14996|0.37|0.53|2|143|3|0|1|0|support|low|
 |14997|0.11|0.96|6|280|4|0|1|0|support|low|
 |14998|0.37|0.52|2|158|3|0|1|0|support|low|
+Now let's check for any duplicate entries in the data. The output shows the first five occurrences of rows that are duplicated farther down in the dataframe. How likely is it that these are legitimate entries? In other words, how plausible is it that two employees self-reported the exact same response for every column? With several continuous variables across 10 columns, it seems very unlikely that these observations are legitimate. Let's proceed by dropping them. But first, I want to check if we drop the duplicates, is the dataset going to be imbalanced.
+```
+# Checking duplicates for each category in left column
+df0_duplicated['left'].value_counts()
+```
+![duplicate](https://github.com/ImanBrjn/python_Salifort_Motors/assets/140934258/50cf8d9f-72cb-426c-b79e-81bf0d77c10d)    
+This shows that both of the classes have fairly similar duplicates.
+```
+# Drop duplicates and save resulting dataframe in a new variable as needed
+df1 = df0.drop_duplicates(keep='first')
+
+# Display first few rows of new dataframe as needed
+df1.head()
+```
+| |satisfaction_level|last_evaluation|number_project|average_monthly_hours|tenure|work_accident|left|promotion_last_5years|department|salary|
+|:----|:----|:----|:----|:----|:----|:----|:----|:----|:----|:----|
+|0|0.38|0.53|2|157|3|0|1|0|sales|low|
+|1|0.80|0.86|5|262|6|0|1|0|sales|medium|
+|2|0.11|0.88|7|272|4|0|1|0|sales|medium|
+|3|0.72|0.87|5|223|5|0|1|0|sales|low|
+|4|0.37|0.52|2|159|3|0|1|0|sales|low|
