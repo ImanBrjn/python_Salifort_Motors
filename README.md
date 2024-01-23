@@ -825,8 +825,7 @@ sns.boxplot(x=df1['tenure'])
 plt.show()
 ```
 
-
-![png](output_38_0.png)   
+![output_38_0](https://github.com/ImanBrjn/python_Salifort_Motors/assets/140934258/05a4214c-0fc5-4a42-a68b-1f76274ded5d)   
 
 
 The boxplot above shows that there are outliers in the `tenure` variable. It would be helpful to investigate how many rows in the data contain outliers in the `tenure` column.   
@@ -928,8 +927,8 @@ plt.show()
 
 ```
 
+![output_48_0](https://github.com/ImanBrjn/python_Salifort_Motors/assets/140934258/b99422bf-0e66-487c-8b66-1fb54241fb11)   
 
-![png](output_48_0.png)   
 
 
 It might be natural that people who work on more projects would also work longer hours. This appears to be the case here, with the mean hours of each group (stayed and left) increasing with the number of projects worked. However, a few things stand out from this plot.   
@@ -975,8 +974,7 @@ plt.title('Monthly hours by last evaluation score', fontsize='14');
 
 ```
 
-
-![png](output_52_0.png)   
+![output_52_0](https://github.com/ImanBrjn/python_Salifort_Motors/assets/140934258/e742a8b4-d9ed-4ac4-881d-ecb383921741)   
 
 
 The scatterplot above shows that there was a sizeable group of employees who worked around 240–315 hours per month. 315 hours per month is over 75 hours per week for a whole year. It's likely this is related to their satisfaction levels being close to zero.   
@@ -1010,8 +1008,7 @@ plt.show();
 
 ```
 
-
-![png](output_54_0.png)   
+![output_54_0](https://github.com/ImanBrjn/python_Salifort_Motors/assets/140934258/549e8780-2593-4cc3-ab2d-53df2e5bbbe3)   
 
 
 There are many observations we could make from this plot.   
@@ -1103,8 +1100,8 @@ ax[1].set_title('Salary histogram by tenure: long-tenured people', fontsize='14'
 
 ```
 
+![output_58_0](https://github.com/ImanBrjn/python_Salifort_Motors/assets/140934258/d455d2ed-47a3-4842-a8ab-b19171b80629)   
 
-![png](output_58_0.png)   
 
 
 The plots above show that long-tenured employees were not disproportionately comprised of higher-paid employees.   
@@ -1123,8 +1120,8 @@ plt.title('Monthly hours by last evaluation score', fontsize='14');
 
 ```
 
+ ![output_60_0](https://github.com/ImanBrjn/python_Salifort_Motors/assets/140934258/09950596-0a3b-4f52-aa32-bb033cc9256f)   
 
-![png](output_60_0.png)   
 
 
 The following observations can be made from the scatterplot above:   
@@ -1147,7 +1144,8 @@ plt.title('Monthly hours by promotion last 5 years', fontsize='14');
 ```
 
 
-![png](output_62_0.png)   
+![output_62_0](https://github.com/ImanBrjn/python_Salifort_Motors/assets/140934258/8a881c17-8254-4939-b7ab-257ceaf3a522)   
+
 
 
 The plot above shows the following:
@@ -1192,7 +1190,8 @@ plt.title('Counts of stayed/left by department', fontsize=14);
 ```
 
 
-![png](output_65_0.png)     
+![output_65_0](https://github.com/ImanBrjn/python_Salifort_Motors/assets/140934258/5eed937a-611f-43b7-a708-5141967c29e3)   
+
 
 
 There doesn't seem to be any department that differs significantly in its proportion of employees who left to those who stayed.   
@@ -1208,7 +1207,8 @@ heatmap.set_title('Correlation Heatmap', fontdict={'fontsize':14}, pad=12);
 ```
 
 
-![png](output_67_0.png)   
+![output_67_0](https://github.com/ImanBrjn/python_Salifort_Motors/assets/140934258/11dc2cd1-a7de-46a3-8110-64a2fec762aa)   
+
 
 
 The correlation heatmap confirms that the number of projects, monthly hours, and evaluation scores all have some positive correlation with each other. Additionally, whether an employee leaves is negatively correlated with their satisfaction level.
@@ -1218,24 +1218,17 @@ The correlation heatmap confirms that the number of projects, monthly hours, and
 It appears that employees are leaving the company as a result of poor management. Leaving is tied to longer working hours, many projects, and generally lower satisfaction levels. It can be ungratifying to work long hours and not receive promotions or good evaluation scores. There's a sizeable group of employees at this company who are probably burned out. It also appears that if an employee has spent more than six years at the company, they tend not to leave. 
 
 # paCe: Construct Stage
-In this stage I:
-- Determine which models are most appropriate
-- Construct the model
-- Confirm model assumptions
-- Evaluate model results to determine how well the model fits the data
 
+In this stage, the appropriate models are determined, the model is constructed, model assumptions are confirmed, and the model results are evaluated to determine how well it fits the data.
 
 
 ## Step 3 and 4. Model Building and Results and Evaluation
-- Fit a model that predicts the outcome variable using two or more independent variables
-- Check model assumptions
-- Evaluate the model
 
-### Identify the type of prediction task.
+### Identifing the type of prediction task.
 
-My goal is to predict whether an employee leaves the company, which is a categorical outcome variable. So this task involves classification. More specifically, this involves binary classification, since the outcome variable `left` can be either 1 (indicating employee left) or 0 (indicating employee didn't leave). 
+My goal is to predict whether an employee leaves the company, which is a categorical outcome variable. This task involves classification, specifically binary classification, as the outcome variable `left` can be either 1 (indicating the employee left) or 0 (indicating the employee didn't leave).
 
-### Identify the types of models most appropriate for this task.
+### Identifing the types of models most appropriate for this task.
 
 Since the variable we want to predict (whether an employee leaves the company) is categorical, we could either build a Logistic Regression model, or a Tree-based Machine Learning model.
 
@@ -1644,10 +1637,10 @@ tree1_cv_results
 
 All of these scores from the decision tree model are strong indicators of good model performance. 
 
-We could construct a random forest model next.
+We could construct a random forest model next.   
 
 #### Random forest - Round 1
-Construct a random forest model and set up cross-validated grid-search to exhuastively search for the best model parameters.
+Constructing a random forest model and set up cross-validated grid-search to exhuastively search for the best model parameters.
 
 
 ```python
@@ -2092,10 +2085,10 @@ print('Min hours:', df2['overworked'].min())
     Min hours: 96
 
 
-166.67 is approximately the average number of monthly hours for someone who works 50 weeks per year, 5 days per week, 8 hours per day. 
+166.67 is approximately the average number of monthly hours for someone who works 50 weeks per year, 5 days per week, 8 hours per day.    
 
-We will define being overworked as working more than 175 hours per month on average.
-
+We will define being overworked as working more than 175 hours per month on average.   
+   
 To make the `overworked` column binary, we can reassign the column using a boolean mask.
 - `df3['overworked'] > 175` creates a series of booleans, consisting of `True` for every value > 175 and `False` for every values ≤ 175
 - `.astype(int)` converts all `True` to `1` and all `False` to `0` 
@@ -2389,8 +2382,8 @@ tree2.best_score_
 
 
 
-This model performs very well, even without satisfaction levels and detailed hours worked data. 
-
+This model performs very well, even without satisfaction levels and detailed hours worked data.   
+   
 Next, checking the other scores.
 
 
@@ -2569,7 +2562,7 @@ disp.plot(values_format='');
 ```
 
 
-![png](output_145_0.png)   
+![output_145_0](https://github.com/ImanBrjn/python_Salifort_Motors/assets/140934258/1062ba99-dcad-43e6-b29d-6661fe082047)    
 
 
 The model predicts more false positives than false negatives, which means that some employees may be identified as at risk of quitting or getting fired, when that's actually not the case. But this is still a strong model.
@@ -2587,8 +2580,8 @@ plot_tree(tree2.best_estimator_, max_depth=6, fontsize=14, feature_names=X.colum
 plt.show()
 ```
 
-
-![png](output_148_0.png)   
+  
+![output_148_0](https://github.com/ImanBrjn/python_Salifort_Motors/assets/140934258/a603584e-a8fc-4cd1-b676-fcd28ed58d3f)   
 
 
 
@@ -2692,7 +2685,8 @@ plt.show()
 ```
 
 
-![png](output_151_0.png)   
+![output_151_0](https://github.com/ImanBrjn/python_Salifort_Motors/assets/140934258/f8eb864a-1dc6-45bb-b689-7be9ccd02ec5)   
+
 
 
 
@@ -2700,7 +2694,7 @@ The barplot above shows that in this decision tree model, `last_evaluation`, `nu
 
 #### Random forest feature importance
 
-Now, plot the feature importances for the random forest model.
+Now, let's plot the feature importances for the random forest model.
 
 
 ```python
@@ -2731,18 +2725,14 @@ plt.show()
 ```
 
 
-![png](output_154_0.png)   
+![output_154_0](https://github.com/ImanBrjn/python_Salifort_Motors/assets/140934258/78b3b1b7-8fd4-40e9-92e3-c62c2ba40d9c)   
+
 
 
 The plot above shows that in this random forest model, `last_evaluation`, `number_project`, `tenure`, and `overworked` have the highest importance, in that order. These variables are most helpful in predicting the outcome variable, `left`, and they are the same as the ones used by the decision tree model.
 
 # pacE: Execute Stage
-- Interpret model performance and results
-- Share actionable steps with stakeholders
 
-
-
-✏
 ## Recall evaluation metrics
 
 - **AUC** is the area under the ROC curve; it's also considered the probability that the model ranks a random positive example more highly than a random negative example.
@@ -2753,17 +2743,11 @@ The plot above shows that in this random forest model, `last_evaluation`, `numbe
 
 
 ## Step 4. Results and Evaluation
-- Interpret model
-- Evaluate model performance using metrics
-- Prepare results, visualizations, and actionable steps to share with stakeholders
-
-
-
 
 ### Summary of model results
 After conducting feature engineering, the decision tree model achieved AUC of 93.8%, precision of 87.0%, recall of 90.4%, f1-score of 88.7%, and accuracy of 96.2%, on the test set. The random forest modestly outperformed the decision tree model. 
 
-### Conclusion, Recommendations, Next Steps
+### Conclusion and Recommendations
 
 The models and the feature importances extracted from the models confirm that employees at the company are overworked. 
 
@@ -2776,9 +2760,6 @@ To retain employees, the following recommendations could be presented to the sta
 * Hold company-wide and within-team discussions to understand and address the company work culture, across the board and in specific contexts. 
 * High evaluation scores should not be reserved for employees who work 200+ hours per month. Consider a proportionate scale for rewarding employees who contribute more/put in more effort. 
 
-**Next Steps**
-
-It may be justified to still have some concern about data leakage. It could be prudent to consider how predictions change when `last_evaluation` is removed from the data. It's possible that evaluations aren't performed very frequently, in which case it would be useful to be able to predict employee retention without this feature. It's also possible that the evaluation score determines whether an employee leaves or stays, in which case it could be useful to pivot and try to predict performance score. The same could be said for satisfaction score. 
 
 
 **Thank you for taking the time to read my Capstone Project!**
