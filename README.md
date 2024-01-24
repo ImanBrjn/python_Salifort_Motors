@@ -2,7 +2,7 @@
 
 ## Description and deliverables
 
-In this capstone project, I will analyze a dataset and build predictive models that can provide insights to the Human Resources (HR) department of a large consulting firm.
+This is my case study project for the [Google Data Analytics Professional Certificate published by coursera](https://www.coursera.org/professional-certificates/google-advanced-data-analytics).In this capstone project, I will analyze a dataset and build predictive models that can provide insights to the Human Resources (HR) department of a large consulting firm.
 My deliverables will include model evaluation (and interpretation if applicable), data visualizations directly related to the question asked, ethical considerations, and a list of resources I used to troubleshoot and find answers or solutions.
 
 
